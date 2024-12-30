@@ -1,3 +1,2 @@
-
-*.jai linguist-language=Jai
+*.jai linguist-language=C
 *.bat linguist-vendored
