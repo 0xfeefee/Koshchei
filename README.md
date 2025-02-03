@@ -9,18 +9,20 @@ will likely be broken in many cases since `Jai` is a completely different langua
 ## Structure
 - See: [docs/Time.md](./docs/Time.md) for estimated time spent working on this project.
 - See: [docs/Idea.md](./docs/Idea.md) for a rough idea of what this game is supposed to be.
-- Configure the build metaprogram directly in: [build_config.jai](./build_config.jai).
-- Simple scripts for running/building the project: [scripts](./scripts).
+- Configure the build metaprogram directly in: [./build/config.jai](./build_config.jai).
 
 ## Build
 To build simply run:
 ```cmd
-jai build.jai
+cd build && jai build.jai
 ```
-or use the provided script: [scripts/build.bat](./scripts/build.bat) which does the same.
 
 To change build parameters such as verbosity or level of optimization edit `build_config.jai`
 directly.
+
+## Screenshots
+![Graphics prototyping](https://github.com/0xfeefee/Koschei/blob/main/docs/screenshots/graphics_prototyping.PNG)
+
 
 ## LICENSE
 ```txt

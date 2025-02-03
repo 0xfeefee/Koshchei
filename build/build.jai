@@ -1,4 +1,5 @@
-/* 
+
+/*
 # Build
 
     Build may be configured in the { build_config.jai } file:
@@ -13,6 +14,14 @@
     specific or non-standard modules placed in the { LOCAL_MODULE_IMPORT_DIRECTORY } will be discoverable
     by { #import }.
 */
+
+#import "Basic";
+#import "Compiler";
+#import "File_Utilities";
+#import "File";
+#import "Bindings_Generator";
+
+#load "config.jai";
 
 #run {
     // No output during compile time:
@@ -37,6 +46,11 @@
         print_to_builder(*sb, "--\n");
 
         print(builder_to_string(*sb));
+    }
+
+    // Generate Raylib module if necessary:
+    if !file_exists(tprint("%/raylib_win64", LOCAL_MODULE_IMPORT_DIRECTORY)) {
+        generate_raylib_module("raylib_win64", "../vendor/raylib-5.0_win64_msvc16");
     }
 
     // Select build mode:
@@ -79,8 +93,8 @@ do_debug_build :: (workspace: Workspace) {
     set_build_options(options, workspace);
 
     // Entry point & config file are preloaded:
-    add_build_file("src/main.jai", workspace);
-    add_build_file("build_config.jai", workspace);
+    add_build_file("../src/main.jai", workspace);
+    add_build_file("config.jai", workspace);
 }
 
 /*
@@ -113,12 +127,58 @@ do_release_build :: (workspace: Workspace) {
 
     // Entry point & config file are preloaded:
     add_build_file("src/main.jai", workspace);
-    add_build_file("build_config.jai", workspace);
+    add_build_file("config.jai", workspace);
 }
 
-#load "build_config.jai";
+/*
+    Generate the raylib module, right now it works for windows only!
+*/
+generate_raylib_module :: (module_name: string, raylib_path: string) {
+    using options: Generate_Bindings_Options;
+    strip_flags                         = 0;
+    generate_compile_time_struct_checks = false;
+    alias_original_enum_names           = false;
+    c_enum_emulation                    = false;
+    generate_library_declarations       = false;
 
-#import "Basic";
-#import "Compiler";
-#import "File_Utilities";
-#import "File";
+    // Add definitions for things that are missing in the { module.jai } header.
+    header = #string MODULE_HEADER
+        va_list :: *void;
+    MODULE_HEADER
+
+    // Link against system libraries we need in the { module.jai } footer (order matters).
+    footer = #string MODULE_FOOTER
+        user32  :: #library,system,link_always,no_dll "user32";
+        gdi32   :: #library,system,link_always,no_dll "gdi32";
+        shell32 :: #library,system,link_always,no_dll "shell32";
+        winmm   :: #library,system,link_always,no_dll "winmm";
+        raylib  :: #library,no_dll "lib/raylib";
+    MODULE_FOOTER
+
+    // Add { Raylib } files to the generator.
+    raylib_lib_directory     := tprint("%/lib", raylib_path);
+    raylib_include_directory := tprint("%/include", raylib_path);
+
+    array_add(*libpaths, raylib_lib_directory);
+    array_add(*libnames, "raylib");
+    array_add(*include_paths, raylib_include_directory);
+    array_add(*source_files, ..string.["raylib.h", "raymath.h", "rlgl.h"]);
+
+    // Generate module directory.
+    raylib_module_directory     := tprint("%/%", LOCAL_MODULE_IMPORT_DIRECTORY, module_name);
+    raylib_module_lib_directory := tprint("%/lib", raylib_module_directory);
+    raylib_module_file          := tprint("%/module.jai", raylib_module_directory);
+
+    // Recursively create directories for the Raylib module:
+    make_directory_if_it_does_not_exist(raylib_module_lib_directory, true);
+
+    // Generate bindings and save them as module.jai.
+    generate_bindings(options, raylib_module_file);
+
+    for string.["raylib.lib"] {
+        file_src  := tprint("%/%", raylib_lib_directory, it);
+        file_dest := tprint("%/%", raylib_module_lib_directory, it);
+
+        copy_file(file_src, file_dest);
+    }
+}

@@ -2,6 +2,13 @@
 # Directories:
 _w_scripts/
 bin/
+local_modules/raylib_win64/
+assets/
+vendor/
 
 # Files:
 .tmy
+tmy_md.md
+*.sublime-workspace
+*.sublime-project
+
