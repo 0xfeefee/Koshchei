@@ -2,7 +2,7 @@
 # Directories:
 _w_scripts/
 bin/
-local_modules/raylib_win64/
+modules/raylib_win64/
 assets/
 vendor/
 

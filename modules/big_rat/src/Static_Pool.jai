@@ -1,10 +1,4 @@
 /*
-# big_rat: dsa
-
-	Simple, general purpose data structures.
-*/
-
-/*
 # Static_Pool
 
 	This is an array that is pre-allocated and is counted from { 0 } to { capacity-1 } (inclusive). Difference between this and { Pool } is that a { Pool } is expected to be re-used during the lifetime of this application and { Static_Pool } is not!
@@ -23,11 +17,20 @@
 
 		Marks the pool as empty.
 */
+
+/*
+## Types
+*/
+
 Static_Pool :: struct($T: Type, $N: s16) {
 	index: s16 = 0;
 	data:  [N]T;
 }
 
+
+/*
+## Procedures
+*/
 
 static_pool_new :: (using instance: *Static_Pool($T, $N)) -> *T, s16 {
 	assert(index < N, "Static_Pool is full!");
@@ -40,7 +43,6 @@ static_pool_new :: (using instance: *Static_Pool($T, $N)) -> *T, s16 {
 	return element, element_index;
 }
 
-
 static_pool_new_view :: (using instance: *Static_Pool($T, $N), count: s16) -> []T, s16 {
 	// We count { N + 1 } here, because we are adding { count } before creating the element.
 	assert((index + count) < N + 1, "Static_Pool is full!");
@@ -52,10 +54,23 @@ static_pool_new_view :: (using instance: *Static_Pool($T, $N), count: s16) -> []
 	return view, index;
 }
 
-
 static_pool_clear :: (using instance: *Static_Pool($T, $N)) {
 	index = 0;
 }
+
+static_pool_get :: (instance: *Static_Pool($T, $N), index: s16) -> *T {
+	assert(index >= 0 && index < N, "Invalid index given!");
+	return *instance.data[index];
+}
+
+static_pool_full :: (instance: *Static_Pool($T, $N)) -> bool {
+	return instance.index == instance.N-1;
+}
+
+
+/*
+## Extensions
+*/
 
 for_expansion :: (instance: *Static_Pool($T, $N), body: Code, flags: For_Flags) #expand {
 	max := ifx instance.index == N then N-1 else instance.index;
@@ -68,18 +83,10 @@ for_expansion :: (instance: *Static_Pool($T, $N), body: Code, flags: For_Flags) 
 }
 
 
-static_pool_get :: (instance: *Static_Pool($T, $N), index: s16) -> *T {
-	assert(index >= 0 && index < N, "Invalid index given!");
-	return *instance.data[index];
-}
-
-static_pool_full :: (instance: *Static_Pool($T, $N)) -> bool {
-	return instance.index == instance.N-1;
-}
-
 /*
-## Static_Pool: internals
+## Tests
 */
+
 #scope_file
 #if BIG_RAT_TEST_DSA #run {
 	pool: Static_Pool(int, 128);

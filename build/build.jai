@@ -27,7 +27,7 @@
     // No output during compile time:
     set_build_options_dc(.{
         do_output= false,
-        write_added_strings= false
+        write_added_strings= false,
     });
 
     workspace := compiler_create_workspace(PROJECT_NAME);

@@ -1,11 +1,10 @@
 
 #import "raylib_win64";
+#import "big_rat";
 
 WINDOW_WIDTH  :: 1920;
 WINDOW_HEIGHT :: 1080;
 CLEAR_COLOR   :: Color.{ 20, 20, 20, 255 };
-
-f32 :: float32;
 
 VS_SOURCE :: #string SHADER_END
 
@@ -58,10 +57,12 @@ void main() {
 SHADER_END
 
 main :: () {
-	// Initialize the window:
-	InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello, Window!");
-	SetTargetFPS(144);
-	defer CloseWindow();
+	init(.{
+		width= 1920,
+		height= 1080,
+		title= PROJECT_INFO_STRING,
+		framerate= 144,
+	});
 
 	// Initialize the camera:
 	camera := Camera.{
