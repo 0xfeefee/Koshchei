@@ -21,7 +21,9 @@ To change build parameters such as verbosity or level of optimization edit `buil
 directly.
 
 ## Screenshots
-![Graphics prototyping](https://github.com/0xfeefee/Koschei/blob/main/docs/screenshots/graphics_prototyping.PNG)
+
+### Graphics prototyping
+![Graphics prototyping](https://github.com/0xfeefee/Koshchei/blob/main/docs/screenshots/graphics_prototyping.PNG)
 
 
 ## LICENSE
