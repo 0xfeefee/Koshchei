@@ -1,10 +1,9 @@
 
-#import "raylib_win64";
 #import "big_rat";
 
 WINDOW_WIDTH  :: 1920;
 WINDOW_HEIGHT :: 1080;
-CLEAR_COLOR   :: Color.{ 20, 20, 20, 255 };
+CLEAR_COLOR   :: rl.Color.{ 20, 20, 20, 255 };
 
 VS_SOURCE :: #string SHADER_END
 
@@ -56,6 +55,8 @@ void main() {
 }
 SHADER_END
 
+using rl;
+
 main :: () {
 	init(.{
 		width= 1920,
@@ -65,19 +66,15 @@ main :: () {
 	});
 
 	// Initialize the camera:
-	camera := Camera.{
-		position= .{ 0.0, 10.0, 0.0 },
-		target= .{ 0.0, 0.0, 0.0 },
-		up= .{ 0.0, 0.0, 1.0 },
-		fovy= 45.0,
-		projection= xx CameraProjection.PERSPECTIVE
-	};
+	camera  := create_camera(.{0, 10, 0}, 45);
+	camera2 := create_camera(.{0, 12, -4}, 45);
 
 	// State:
 	rotation_angle: f32;
 	angle: f32 = 0.25;
 	range: f32 = 125.0;
 	swirl_center: Vector2 = .{ WINDOW_WIDTH / 2.0, WINDOW_HEIGHT / 2.0 };
+	camera_counter: int = 0;
 
 	// Texture:
 	// @note: We messed up the UV directions, they need to be flipped, but fine for now!.
@@ -87,14 +84,14 @@ main :: () {
 
 	// Setup render texture:
 	frame_texture: RenderTexture = LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
-	frame_shader: Shader = LoadShaderFromMemory(null, FS_SOURCE);
+	frame_shader := create_shader(fragment_source= FS_SOURCE);
 
-	u_center := GetShaderLocation(frame_shader, "center");
-	u_angle  := GetShaderLocation(frame_shader, "angle");
-	u_range  := GetShaderLocation(frame_shader, "radius");
+	u_center := uniform_location(frame_shader, "center");
+	u_angle  := uniform_location(frame_shader, "angle");
+	u_range  := uniform_location(frame_shader, "radius");
 
 	// Run the main loop:
-	while !WindowShouldClose() {
+	while should_run() {
 		// Start:
 		BeginDrawing();
 		BeginTextureMode(frame_texture);
@@ -114,9 +111,9 @@ main :: () {
 		swirl_center.x = mouse_pos.x;
 		swirl_center.y = mouse_pos.y;
 
-		SetShaderValue(frame_shader, u_center, cast(*void, *swirl_center), cast(s32)ShaderUniformDataType.VEC2);
-		SetShaderValue(frame_shader, u_angle, cast(*void, *angle), cast(s32)ShaderUniformDataType.FLOAT);
-		SetShaderValue(frame_shader, u_range, cast(*void, *range), cast(s32)ShaderUniformDataType.FLOAT);
+		set_uniform(frame_shader, u_center, *swirl_center);
+		set_uniform(frame_shader, u_angle, *angle);
+		set_uniform(frame_shader, u_range, *range);
 
 		// Draw the background elements
 		for i: 0..90 {
@@ -125,8 +122,14 @@ main :: () {
 			}
 		}
 
-		// Work:
-		BeginMode3D(camera); {
+		camera_counter += 1;
+		if camera_counter > 256 {
+			camera_counter = -256;
+		}
+
+		// Draw the 3D elements:
+		{
+			begin_camera(ifx camera_counter > 0 then camera else camera2);
 			DrawModelEx(
 				card,
 				.{ 0.0, 0.0, 0.0 },
@@ -135,12 +138,14 @@ main :: () {
 			    .{ 1.0, 1.0, 1.0 },
 			    .{ 255, 255, 255, 255 }
 			);
-		} EndMode3D();
+		}
 		EndTextureMode();
 
-		BeginShaderMode(frame_shader);
-		DrawTexture(frame_texture.texture, 0, 0, .{255,255,255,255});
-		EndShaderMode();
+		// Apply post-processing:
+		{
+			begin_shader(frame_shader);
+			DrawTexture(frame_texture.texture, 0, 0, .{255,255,255,255});
+		}
 
 		rotation_angle += 100 * GetFrameTime();
 

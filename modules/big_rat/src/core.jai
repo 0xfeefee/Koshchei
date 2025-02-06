@@ -23,6 +23,8 @@ Config :: struct {
 	Initializes the engine.
 */
 init :: (using config: Config) #expand {
+	init_all_storage();
+
 	// Create and configure the window:
 	rl.InitWindow(width, height, title.data);
 
@@ -58,5 +60,19 @@ init :: (using config: Config) #expand {
 	`defer rl.CloseWindow();
 }
 
+should_run :: () -> bool #must {
+	return !rl.WindowShouldClose() && !stop_requested;
+}
+
+stop :: () {
+	stop_requested = true;
+}
+
+init_all_storage :: () {
+	_camera_storage = New(Static_Pool(rl.Camera, MAX_CAMERA_COUNT));
+	_shader_storage = New(Static_Pool(rl.Shader, MAX_SHADER_COUNT));
+}
+
 #scope_file
 current_config: Config;
+stop_requested: bool = false;

@@ -110,8 +110,6 @@ error_if :: inline (condition: bool, fmt: string, args: ..Any, caller := #caller
 	print_error(fmt, ..args, caller, print_location);
 }
 
-
-#scope_file
 crash :: (fmt: string, args: .. Any, caller := #caller_location, print_location := true) {
 	format := maybe_add_location_to_format(fmt, caller, print_location);
 	print_color("=== [CRASH] ===\n\n* %\n\n=== [CRASH] ===\n", tprint(format, ..args), color= Console_Color.RED);

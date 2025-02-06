@@ -32,7 +32,7 @@ Static_Pool :: struct($T: Type, $N: s16) {
 ## Procedures
 */
 
-static_pool_new :: (using instance: *Static_Pool($T, $N)) -> *T, s16 {
+static_pool_new :: (using instance: *Static_Pool($T, $N)) -> *T #must, s16 {
 	assert(index < N, "Static_Pool is full!");
 
 	element := *data[index];
