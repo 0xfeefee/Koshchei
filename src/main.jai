@@ -78,9 +78,10 @@ main :: () {
 
 	// Texture:
 	// @note: We messed up the UV directions, they need to be flipped, but fine for now!.
-	card_texture := LoadTexture("../assets/uv_Playing_Card_Y1.png");
-	card := LoadModel("../assets/b_Playing_Card_Y1.obj");
-	card.materials[0].maps[xx MaterialMapIndex.ALBEDO].texture = card_texture;
+	card_texture := load_texture("../assets/uv_Playing_Card_Y1.png");
+	card_id := load_model("../assets/b_Playing_Card_Y1.obj");
+	set_texture(card_id, card_texture);
+	card := get_model(card_id);
 
 	// Setup render texture:
 	frame_texture: RenderTexture = LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -89,6 +90,13 @@ main :: () {
 	u_center := uniform_location(frame_shader, "center");
 	u_angle  := uniform_location(frame_shader, "angle");
 	u_range  := uniform_location(frame_shader, "radius");
+
+	dots: []Vector2 = NewArray(100*100, Vector2);
+	for i:0..100-1 {
+		for k:0..100-1 {
+			dots[i*100+k] = .{i*20.0, k*15.0};
+		}
+	}
 
 	// Run the main loop:
 	while should_run() {
@@ -116,10 +124,8 @@ main :: () {
 		set_uniform(frame_shader, u_range, *range);
 
 		// Draw the background elements
-		for i: 0..90 {
-			for k: 0..50 {
-				DrawCircleV(.{i*25.0, k*25.0}, 4.0, .{40,40,40,255});
-			}
+		for dots {
+			DrawCircleV(it, 1.0, .{100,0,0,255});
 		}
 
 		camera_counter += 1;
@@ -128,6 +134,8 @@ main :: () {
 		}
 
 		// Draw the 3D elements:
+		// Card needs to be 2 models, 1 for each side, because we do not want to repeat the texture or use 2
+		// textures per render.
 		{
 			begin_camera(ifx camera_counter > 0 then camera else camera2);
 			DrawModelEx(

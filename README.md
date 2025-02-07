@@ -8,7 +8,6 @@ will likely be broken in many cases since `Jai` is a completely different langua
 
 ## Structure
 - See: [docs/Time.md](./docs/Time.md) for estimated time spent working on this project.
-- See: [docs/Idea.md](./docs/Idea.md) for a rough idea of what this game is supposed to be.
 - Configure the build metaprogram directly in: [./build/config.jai](./build_config.jai).
 
 ## Build

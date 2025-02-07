@@ -13,9 +13,7 @@ uniform_location :: (id: Shader_Id, uniform_name: string) -> s32 #must {
 
 	return rl.GetShaderLocation(shader, uniform_name.data);
 }
-// SetShaderValue(frame_shader, u_center, cast(*void, *swirl_center), cast(s32)ShaderUniformDataType.VEC2);
-// SetShaderValue(frame_shader, u_angle, cast(*void, *angle), cast(s32)ShaderUniformDataType.FLOAT);
-// SetShaderValue(frame_shader, u_range, cast(*void, *range), cast(s32)ShaderUniformDataType.FLOAT);
+
 set_uniform :: (id: Shader_Id, uniform_location: s32, value: $T) {
 	shader := static_pool_get(_shader_storage, id);
 

@@ -9,9 +9,14 @@
 #load "src/core.jai";
 #load "src/camera.jai";
 #load "src/shader.jai";
+#load "src/texture.jai";
+#load "src/model.jai";
 
-MAX_CAMERA_COUNT :: 16;
-MAX_SHADER_COUNT :: 8;
+MAX_CAMERA_COUNT  :: 16;
+MAX_SHADER_COUNT  :: 8;
+MAX_TEXTURE_COUNT :: 16;
+MAX_MODEL_COUNT   :: 16;
+MAX_SPRITE_COUNT  :: 128;
 
 rl :: #import "raylib_win64";
 

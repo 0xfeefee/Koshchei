@@ -69,9 +69,12 @@ stop :: () {
 }
 
 init_all_storage :: () {
-	_camera_storage = New(Static_Pool(rl.Camera, MAX_CAMERA_COUNT));
-	_shader_storage = New(Static_Pool(rl.Shader, MAX_SHADER_COUNT));
+	_camera_storage  = New(Static_Pool(rl.Camera, MAX_CAMERA_COUNT));
+	_shader_storage  = New(Static_Pool(rl.Shader, MAX_SHADER_COUNT));
+	_texture_storage = New(Static_Pool(rl.Texture, MAX_TEXTURE_COUNT));
+	_model_storage   = New(Static_Pool(rl.Model, MAX_MODEL_COUNT));
 }
+
 
 #scope_file
 current_config: Config;

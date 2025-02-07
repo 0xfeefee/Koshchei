@@ -6,7 +6,7 @@ Vec4 :: rl.Vector4;
 Camera_Id :: s16;
 
 create_camera :: (camera_position: Vec3, fov: float = 0) -> Camera_Id {
-	// if FOV is greater tha	n 0 we use PERSPECTIVE projection:
+	// if FOV is greater than 0 we use PERSPECTIVE projection:
 	camera_projection: s32 = cast(s32)ifx fov > 0 rl.CameraProjection.PERSPECTIVE else rl.CameraProjection.ORTHOGRAPHIC;
 
 	camera, camera_id := static_pool_new(_camera_storage);
