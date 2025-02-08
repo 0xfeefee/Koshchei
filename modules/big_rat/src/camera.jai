@@ -5,7 +5,7 @@ Vec4 :: rl.Vector4;
 
 Camera_Id :: s16;
 
-create_camera :: (camera_position: Vec3, fov: float = 0) -> Camera_Id {
+create_camera :: (camera_position: Vec3, fov: float = 0, up: Vec3 = .{0, 0, -1}) -> Camera_Id {
 	// if FOV is greater than 0 we use PERSPECTIVE projection:
 	camera_projection: s32 = cast(s32)ifx fov > 0 rl.CameraProjection.PERSPECTIVE else rl.CameraProjection.ORTHOGRAPHIC;
 
@@ -13,12 +13,16 @@ create_camera :: (camera_position: Vec3, fov: float = 0) -> Camera_Id {
 	camera.* = rl.Camera.{
 		position= 	camera_position,
 		target=   	.{ 0.0, 0.0, 0.0 },
-		up=       	.{ 0.0, 0.0, 1.0 }, // Same as blender!
+		up=       	up, // Same as blender!
 		fovy= 	  	fov,
 		projection= camera_projection
 	};
 
 	return camera_id;
+}
+
+get_camera :: (camera_id: Camera_Id) -> *rl.Camera {
+	return static_pool_get(_camera_storage, camera_id);
 }
 
 begin_camera :: (id: Camera_Id) #expand {

@@ -11,6 +11,7 @@
 #load "src/shader.jai";
 #load "src/texture.jai";
 #load "src/model.jai";
+#load "src/debug.jai";
 
 MAX_CAMERA_COUNT  :: 16;
 MAX_SHADER_COUNT  :: 8;

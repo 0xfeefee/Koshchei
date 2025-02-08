@@ -67,7 +67,7 @@ main :: () {
 
 	// Initialize the camera:
 	camera  := create_camera(.{0, 10, 0}, 45);
-	camera2 := create_camera(.{0, 12, -4}, 45);
+	camera2 := create_camera(.{0, 15, -4}, 45, up=.{1, 0, 0});
 
 	// State:
 	rotation_angle: f32;
@@ -91,18 +91,32 @@ main :: () {
 	u_angle  := uniform_location(frame_shader, "angle");
 	u_range  := uniform_location(frame_shader, "radius");
 
-	dots: []Vector2 = NewArray(100*100, Vector2);
-	for i:0..100-1 {
-		for k:0..100-1 {
-			dots[i*100+k] = .{i*20.0, k*15.0};
-		}
-	}
+	balatro_texture := load_texture("../assets/dev/balatro.png");
+	set_texture(card_id, balatro_texture);
+	balatro_texture_m := get_texture(balatro_texture);
+	camera_m := get_camera(camera);
+
+	// Back to rendering a card:
+	card_mesh  := rl.GenMeshPlane(2.0, 3.0, 1, 1);
+	card_frontface := rl.LoadModelFromMesh(card_mesh);
+
+	card_front := rl.LoadTexture("../assets/Card_Texture_front.png");
+	card_back  := rl.LoadTexture("../assets/Card_Texture_back.png");
+
+	card_frontface.materials[0].maps[cast(int, rl.MaterialMapIndex.ALBEDO)].texture = card_front;
+	// card_frontface.materials[0].maps[cast(int, rl.MaterialMapIndex.DIFUSE)].color = WHITE;
+// frontPlane.materials[0].maps[MATERIAL_MAP_DIFFUSE].uvTransform = (Vector4){ 1, -1, 0, 0 };
+
+	card_backface := rl.LoadModelFromMesh(card_mesh);
+	card_backface.materials[0].maps[cast(int, rl.MaterialMapIndex.ALBEDO)].texture = card_back;
+
+	// rlDisableBackfaceCulling();
 
 	// Run the main loop:
 	while should_run() {
 		// Start:
 		BeginDrawing();
-		BeginTextureMode(frame_texture);
+		// BeginTextureMode(frame_texture);
 		ClearBackground(CLEAR_COLOR);
 
 		mouse_pos   := GetMousePosition();
@@ -123,15 +137,12 @@ main :: () {
 		set_uniform(frame_shader, u_angle, *angle);
 		set_uniform(frame_shader, u_range, *range);
 
-		// Draw the background elements
-		for dots {
-			DrawCircleV(it, 1.0, .{100,0,0,255});
+		camera_counter += 1;
+		if camera_counter > 512 {
+			camera_counter = -512;
 		}
 
-		camera_counter += 1;
-		if camera_counter > 256 {
-			camera_counter = -256;
-		}
+		draw_screen_grid(32, 32);
 
 		// Draw the 3D elements:
 		// Card needs to be 2 models, 1 for each side, because we do not want to repeat the texture or use 2
@@ -139,7 +150,15 @@ main :: () {
 		{
 			begin_camera(ifx camera_counter > 0 then camera else camera2);
 			DrawModelEx(
-				card,
+				card_frontface,
+				.{ 0.0, 0.0, 0.0 },
+			   	.{ 0.0, 0.0, 1.0 },
+			   	rotation_angle+180.0,
+			    .{ 1.0, 1.0, 1.0 },
+			    .{ 255, 255, 255, 255 }
+			);
+			DrawModelEx(
+				card_backface,
 				.{ 0.0, 0.0, 0.0 },
 			   	.{ 0.0, 0.0, 1.0 },
 			   	rotation_angle,
@@ -147,15 +166,18 @@ main :: () {
 			    .{ 255, 255, 255, 255 }
 			);
 		}
-		EndTextureMode();
+		// EndTextureMode();
 
 		// Apply post-processing:
-		{
-			begin_shader(frame_shader);
-			DrawTexture(frame_texture.texture, 0, 0, .{255,255,255,255});
-		}
+		// {
+		// 	begin_shader(frame_shader);
+		// 	DrawTexture(frame_texture.texture, 0, 0, .{255,255,255,255});
+		// }
 
 		rotation_angle += 100 * GetFrameTime();
+		// if rotation_angle > 360 {
+			// rotation_angle -= 360;
+		// }
 
 		// End:
 		EndDrawing();

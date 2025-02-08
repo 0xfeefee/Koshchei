@@ -5,6 +5,10 @@
 */
 Asset_Path :: string;
 
+s32x2 :: struct {
+	x, y: s32;
+}
+
 /*
 	Used to configure the engine.
 	@todo: convert the boolean variables into flags.
