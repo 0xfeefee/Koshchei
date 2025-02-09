@@ -110,14 +110,21 @@ main :: () {
 	card_backface := rl.LoadModelFromMesh(card_mesh);
 	card_backface.materials[0].maps[cast(int, rl.MaterialMapIndex.ALBEDO)].texture = card_back;
 
-	// rlDisableBackfaceCulling();
+	key_j := create_input(Keyboard_Button.J, .PRESS);
+	current_camera: Camera_Id = camera;
 
 	// Run the main loop:
 	while should_run() {
 		// Start:
 		BeginDrawing();
-		// BeginTextureMode(frame_texture);
+		BeginTextureMode(frame_texture);
 		ClearBackground(CLEAR_COLOR);
+
+		update_inputs();
+
+		if check_input(key_j) {
+			current_camera = ifx current_camera == camera then camera2 else camera;
+		}
 
 		mouse_pos   := GetMousePosition();
 		mouse_delta := GetMouseDelta();
@@ -137,47 +144,24 @@ main :: () {
 		set_uniform(frame_shader, u_angle, *angle);
 		set_uniform(frame_shader, u_range, *range);
 
-		camera_counter += 1;
-		if camera_counter > 512 {
-			camera_counter = -512;
-		}
-
 		draw_screen_grid(32, 32);
 
 		// Draw the 3D elements:
 		// Card needs to be 2 models, 1 for each side, because we do not want to repeat the texture or use 2
 		// textures per render.
 		{
-			begin_camera(ifx camera_counter > 0 then camera else camera2);
-			DrawModelEx(
-				card_frontface,
-				.{ 0.0, 0.0, 0.0 },
-			   	.{ 0.0, 0.0, 1.0 },
-			   	rotation_angle+180.0,
-			    .{ 1.0, 1.0, 1.0 },
-			    .{ 255, 255, 255, 255 }
-			);
-			DrawModelEx(
-				card_backface,
-				.{ 0.0, 0.0, 0.0 },
-			   	.{ 0.0, 0.0, 1.0 },
-			   	rotation_angle,
-			    .{ 1.0, 1.0, 1.0 },
-			    .{ 255, 255, 255, 255 }
-			);
+			begin_camera(current_camera);
+			draw_card(card_frontface, card_backface, rotation_angle);
 		}
-		// EndTextureMode();
+		EndTextureMode();
 
 		// Apply post-processing:
-		// {
-		// 	begin_shader(frame_shader);
-		// 	DrawTexture(frame_texture.texture, 0, 0, .{255,255,255,255});
-		// }
+		{
+			begin_shader(frame_shader);
+			DrawTexture(frame_texture.texture, 0, 0, .{255,255,255,255});
+		}
 
 		rotation_angle += 100 * GetFrameTime();
-		// if rotation_angle > 360 {
-			// rotation_angle -= 360;
-		// }
 
 		// End:
 		EndDrawing();
@@ -185,3 +169,4 @@ main :: () {
 }
 
 #import "Basic";
+#load "card.jai";

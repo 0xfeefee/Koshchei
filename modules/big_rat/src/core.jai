@@ -5,9 +5,6 @@
 */
 Asset_Path :: string;
 
-s32x2 :: struct {
-	x, y: s32;
-}
 
 /*
 	Used to configure the engine.
@@ -77,6 +74,7 @@ init_all_storage :: () {
 	_shader_storage  = New(Static_Pool(rl.Shader, MAX_SHADER_COUNT));
 	_texture_storage = New(Static_Pool(rl.Texture, MAX_TEXTURE_COUNT));
 	_model_storage   = New(Static_Pool(rl.Model, MAX_MODEL_COUNT));
+	_input_mappings  = New(Static_Pool(Input_Mapping, MAX_INPUT_MAPPINGS));
 }
 
 

@@ -12,12 +12,14 @@
 #load "src/texture.jai";
 #load "src/model.jai";
 #load "src/debug.jai";
+#load "src/input.jai";
 
 MAX_CAMERA_COUNT  :: 16;
 MAX_SHADER_COUNT  :: 8;
 MAX_TEXTURE_COUNT :: 16;
 MAX_MODEL_COUNT   :: 16;
 MAX_SPRITE_COUNT  :: 128;
+MAX_INPUT_MAPPINGS :: 100;
 
 rl :: #import "raylib_win64";
 
