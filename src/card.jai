@@ -4,7 +4,7 @@ draw_card :: (front: rl.Model, back: rl.Model, rotation_angle: float) {
 		front,
 		.{ 0.0, 0.0, 0.0 },
 	   	.{ 0.0, 0.0, 1.0 },
-	   	rotation_angle+180.0,
+	   	rotation_angle-180.0,
 	    .{ 1.0, 1.0, 1.0 },
 	    .{ 255, 255, 255, 255 }
 	);

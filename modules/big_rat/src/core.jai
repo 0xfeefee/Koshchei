@@ -80,7 +80,15 @@ begin_drawing :: () #expand {
 	rl.BeginTextureMode(frame_texture);
 	rl.ClearBackground(current_config.background);
 
-	`defer rl.DrawTexture(frame_texture.texture, 0, 0, .{ 255, 255, 255, 255 });
+	`defer rl.DrawTexturePro(
+		frame_texture.texture,
+		.{ 0, 0, cast(float, frame_texture.texture.width), cast(float, -frame_texture.texture.height) },
+		.{ 0, 0, cast(float, current_config.width), cast(float, current_config.height) },
+		.{ 0, 0},
+		0,
+		.{ 255, 255, 255, 255 }
+	);
+
 	`defer rl.EndTextureMode();
 	`defer rl.EndDrawing();
 }
