@@ -18,6 +18,7 @@ Config :: struct {
 	icon_path:  Asset_Path  = "";
 	vsync:      bool 		= true;
 	fullscreen: bool 		= false;
+	background: rl.Color    = .{ 255, 255, 255, 255 };
 };
 
 /*
@@ -53,6 +54,9 @@ init :: (using config: Config) #expand {
 
 	current_config = config;
 
+	// Setup render texture:
+	frame_texture = rl.LoadRenderTexture(width, height);
+
 	// Initialize the Audio device as well:
 	rl.InitAudioDevice();
 
@@ -63,6 +67,22 @@ init :: (using config: Config) #expand {
 
 should_run :: () -> bool #must {
 	return !rl.WindowShouldClose() && !stop_requested;
+}
+
+/*
+	Start drawing the scene with automatic scope-bound end calls. The scene will be drawn onto a
+	{ frame_texture } which can then be used for post-processing.
+
+	@guess: for now I assume we want only one render texture (for post processing).
+*/
+begin_drawing :: () #expand {
+	rl.BeginDrawing();
+	rl.BeginTextureMode(frame_texture);
+	rl.ClearBackground(current_config.background);
+
+	`defer rl.DrawTexture(frame_texture.texture, 0, 0, .{ 255, 255, 255, 255 });
+	`defer rl.EndTextureMode();
+	`defer rl.EndDrawing();
 }
 
 stop :: () {
@@ -77,7 +97,7 @@ init_all_storage :: () {
 	_input_mappings  = New(Static_Pool(Input_Mapping, MAX_INPUT_MAPPINGS));
 }
 
-
 #scope_file
 current_config: Config;
 stop_requested: bool = false;
+frame_texture: rl.RenderTexture;

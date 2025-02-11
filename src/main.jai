@@ -15,6 +15,7 @@ main :: () {
 		height=    WINDOW_HEIGHT,
 		title=     PROJECT_INFO_STRING,
 		framerate= FRAMERATE,
+		background= .{ 50, 50, 50, 255 }
 	});
 
 	// Initialize the camera:
@@ -24,9 +25,6 @@ main :: () {
 
 	// Camera switch input:
 	camera_switch := create_input(Keyboard_Button.J, .PRESS);
-
-	// Setup render texture:
-	frame_texture: RenderTexture = LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	// Textures for the card back and front:
 	card_front := rl.LoadTexture("../assets/Card_Texture_front.png");
@@ -57,24 +55,13 @@ main :: () {
 		rotation_angle += 100 * GetFrameTime();
 
 		// Render:
-		BeginDrawing();
-		BeginTextureMode(frame_texture); {
-			ClearBackground(CLEAR_COLOR);
-
+		begin_drawing(); {
 			// Grid and main scene:
 			draw_screen_grid(32, 32);
 			begin_camera(current_camera); {
 				draw_card(card_frontface, card_backface, rotation_angle);
 			}
-		} EndTextureMode();
-
-		// Post process (MIA, no shader atm)
-		{
-			DrawTexture(frame_texture.texture, 0, 0, .{255,255,255,255});
 		}
-
-		// End:
-		EndDrawing();
 	}
 }
 
