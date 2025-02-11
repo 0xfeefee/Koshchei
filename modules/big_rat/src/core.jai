@@ -11,24 +11,29 @@ Asset_Path :: string;
 	@todo: convert the boolean variables into flags.
 */
 Config :: struct {
-	width:      s32 		= 640;
-	height:     s32 		= 480;
-	framerate:  s32 		= 60;
-	title:      string 		= "Big_Rat";
-	icon_path:  Asset_Path  = "";
-	vsync:      bool 		= true;
-	fullscreen: bool 		= false;
-	background: rl.Color    = .{ 255, 255, 255, 255 };
+	window_width:  s32 		   = 640;
+	window_height: s32 		   = 480;
+	frame_width:   s32         = 0;
+	frame_height:  s32         = 0;
+	framerate:     s32 		   = 60;
+	title:         string 	   = "Big_Rat";
+	icon_path:     Asset_Path  = "";
+	vsync:         bool 	   = true;
+	fullscreen:    bool 	   = false;
+	background:    rl.Color    = .{ 255, 255, 255, 255 };
 };
 
 /*
 	Initializes the engine.
 */
-init :: (using config: Config) #expand {
+init :: (config: Config) #expand {
+	current_config = config;
+	using current_config;
+
 	init_all_storage();
 
 	// Create and configure the window:
-	rl.InitWindow(width, height, title.data);
+	rl.InitWindow(window_width, window_height, title.data);
 
 	if vsync {
 		rl.SetWindowState(cast(u32, rl.ConfigFlags.VSYNC_HINT));
@@ -52,10 +57,13 @@ init :: (using config: Config) #expand {
 		print_warning("Icon was not set!");
 	}
 
-	current_config = config;
-
 	// Setup render texture:
-	frame_texture = rl.LoadRenderTexture(width, height);
+	if frame_width <= 0 || frame_height <= 0 {
+		frame_width  = window_width;
+		frame_height = window_height;
+	}
+
+	frame_texture = rl.LoadRenderTexture(frame_width, frame_height);
 
 	// Initialize the Audio device as well:
 	rl.InitAudioDevice();
@@ -83,7 +91,7 @@ begin_drawing :: () #expand {
 	`defer rl.DrawTexturePro(
 		frame_texture.texture,
 		.{ 0, 0, cast(float, frame_texture.texture.width), cast(float, -frame_texture.texture.height) },
-		.{ 0, 0, cast(float, current_config.width), cast(float, current_config.height) },
+		.{ 0, 0, cast(float, current_config.window_width), cast(float, current_config.window_height) },
 		.{ 0, 0},
 		0,
 		.{ 255, 255, 255, 255 }
@@ -109,3 +117,4 @@ init_all_storage :: () {
 current_config: Config;
 stop_requested: bool = false;
 frame_texture: rl.RenderTexture;
+// resolutions:

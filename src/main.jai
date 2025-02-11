@@ -3,6 +3,8 @@
 
 WINDOW_WIDTH  :: 1920;
 WINDOW_HEIGHT :: 1080;
+FRAME_WIDTH   :: WINDOW_WIDTH/4;
+FRAME_HEIGHT  :: WINDOW_HEIGHT/2;
 FRAMERATE     :: 144;
 CLEAR_COLOR   :: rl.Color.{ 20, 20, 20, 255 };
 
@@ -11,11 +13,13 @@ using rl;
 main :: () {
 	// Create the main window and initialize all the systems:
 	init(.{
-		width=     WINDOW_WIDTH,
-		height=    WINDOW_HEIGHT,
-		title=     PROJECT_INFO_STRING,
-		framerate= FRAMERATE,
-		background= .{ 50, 50, 50, 255 }
+		window_width=     WINDOW_WIDTH,
+		window_height=    WINDOW_HEIGHT,
+		frame_width=      FRAME_WIDTH,
+		frame_height=     FRAME_HEIGHT,
+		title=            PROJECT_INFO_STRING,
+		framerate=        FRAMERATE,
+		background=       .{ 50, 50, 50, 255 }
 	});
 
 	// Initialize the camera:
