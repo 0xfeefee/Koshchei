@@ -5,6 +5,7 @@ bin/
 modules/raylib_win64/
 assets/
 vendor/
+archive/
 
 # Files:
 .tmy

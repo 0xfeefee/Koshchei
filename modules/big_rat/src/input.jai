@@ -318,23 +318,10 @@ get_mouse_position :: inline () -> Vec2 {
 }
 
 #scope_module
-/*
-## Inputs: internal
-
-	Inputs are stored in the { Static_Pool } capacity of which may be configured in the { common/config.jai }.
-	Mouse position is a special case, so we just store it in a { Vec2f } global.
-
-	Here is also defined:
-	- { create_input_mapping }: which is a helper function used to reduce repetition when creating mappings.
-
-	Todo:
-	- move the globals into a context/global struct.
-*/
-
 create_input_mapping :: inline (input: s32, check: u8) -> Input_Mapping_Id {
-	ptr, id := static_pool_new(_input_mappings);
+	ptr, id    := static_pool_new(_input_mappings);
 	ptr.target = input;
-	ptr.type = cast(Check_Type)check;
+	ptr.type   = cast(Check_Type)check;
 
 	return id;
 }
