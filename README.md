@@ -7,7 +7,6 @@ I've manually set the highlighting to `C`, which will make GitHub do some highli
 will likely be broken in many cases since `Jai` is a completely different language.
 
 ## Structure
-- See: [docs/Time.md](./docs/Time.md) for estimated time spent working on this project.
 - Configure the build metaprogram directly in: [./build/config.jai](./build_config.jai).
 
 ## Build

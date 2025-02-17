@@ -111,6 +111,7 @@ init_all_storage :: () {
 	_texture_storage = New(Static_Pool(rl.Texture, MAX_TEXTURE_COUNT));
 	_model_storage   = New(Static_Pool(rl.Model, MAX_MODEL_COUNT));
 	_input_mappings  = New(Static_Pool(Input_Mapping, MAX_INPUT_MAPPINGS));
+	_sprite_storage  = New(Static_Pool(Sprite, MAX_SPRITE_COUNT));
 }
 
 #scope_file

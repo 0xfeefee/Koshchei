@@ -4,7 +4,7 @@
 WINDOW_WIDTH  :: 1920;
 WINDOW_HEIGHT :: 1080;
 FRAME_WIDTH   :: WINDOW_WIDTH/4;
-FRAME_HEIGHT  :: WINDOW_HEIGHT/2;
+FRAME_HEIGHT  :: WINDOW_HEIGHT/4;
 FRAMERATE     :: 144;
 CLEAR_COLOR   :: rl.Color.{ 20, 20, 20, 255 };
 
@@ -23,27 +23,50 @@ main :: () {
 	});
 
 	// Initialize the camera:
-	camera_a       := create_camera(.{0, 10, 0}, 45);
-	camera_b       := create_camera(.{0, 15, -4}, 45, up=.{1, 0, 0});
-	current_camera := camera_a;
+	cameras: [3]Camera_Id;
+	cameras[0] = create_camera(.{0, 10, 0}, 45);
+	cameras[1] = create_camera(.{0, 15, -4}, 45, up=.Z_UP);
+	cameras[2] = create_camera(.{10, 0, -4}, 45, up=.Y_UP);
+
+	camera_counter := 0;
+	current_camera := cameras[camera_counter];
 
 	// Camera switch input:
 	camera_switch := create_input(Keyboard_Button.J, .PRESS);
 
 	// Textures for the card back and front:
-	card_front := rl.LoadTexture("../assets/Card_Texture_front.png");
-	card_back  := rl.LoadTexture("../assets/Card_Texture_back.png");
+	card_front := load_texture("../assets/Card_Texture_front.png");
+	card_back  := load_texture("../assets/Card_Texture_back.png");
+
+	// Atlas:
+	card_atlas := load_texture("../assets/Card_Texture_Atlas.png");
+	sprites: [..]Sprite_Id;
+
+	width: s32  : 256;
+	height: s32 : 384;
+
+	for 0..3 {
+		x, y: s32;
+		x = cast(s32, it) * width;
+		y = 0;
+
+		sprite_id := create_sprite(card_atlas, x, y, width, height);
+		array_add(*sprites, sprite_id);
+	}
 
 	// Card face is just a quad (plane):
 	card_mesh := rl.GenMeshPlane(2.0, 3.0, 1, 1);
+	card_mesh2 := rl.GenMeshPlane(2.0, 3.0, 1, 1);
 
 	// Front face:
-	card_frontface := rl.LoadModelFromMesh(card_mesh);
-	card_frontface.materials[0].maps[cast(int, rl.MaterialMapIndex.ALBEDO)].texture = card_front;
+	card_frontface := create_model(card_mesh);
+	set_texture_from_sprite(card_frontface, sprites[0]);
+	// set_texture(card_frontface, card_front);
 
 	// Back face:
-	card_backface := rl.LoadModelFromMesh(card_mesh);
-	card_backface.materials[0].maps[cast(int, rl.MaterialMapIndex.ALBEDO)].texture = card_back;
+	card_backface := create_model(card_mesh2);
+	set_texture_from_sprite(card_backface, sprites[2]);
+	// set_texture(card_backface, card_back);
 
 	// State:
 	rotation_angle: f32;
@@ -53,7 +76,8 @@ main :: () {
 		// Camera switch:
 		update_inputs();
 		if check_input(camera_switch) {
-			current_camera = ifx current_camera == camera_a then camera_b else camera_a;
+			camera_counter += 1;
+			current_camera = cameras[camera_counter % cameras.count];
 		}
 
 		rotation_angle += 100 * GetFrameTime();

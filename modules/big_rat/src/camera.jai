@@ -5,15 +5,35 @@ Vec4 :: rl.Vector4;
 
 Camera_Id :: s16;
 
-create_camera :: (camera_position: Vec3, fov: float = 0, up: Vec3 = .{0, 0, -1}) -> Camera_Id {
+Camera_Up :: enum u8 {
+	Y_UP;
+	Z_UP;
+	X_UP;
+	Z_DOWN;
+};
+
+camera_up_to_vec3 :: (up: Camera_Up) -> Vec3 {
+	if up == {
+		case .Y_UP;   return .{ 0, 1, 0 };
+		case .Z_UP;   return .{ 0, 0, 1 };
+		case .Z_DOWN; return .{ 0, 0, -1 };
+		case; return .{ 1, 0, 0 };
+	};
+
+	// return .{ 1, 0, 0 };
+}
+
+create_camera :: (camera_position: Vec3, fov: float = 0, up: Camera_Up = .Z_DOWN) -> Camera_Id {
 	// if FOV is greater than 0 we use PERSPECTIVE projection:
 	camera_projection: s32 = cast(s32)ifx fov > 0 rl.CameraProjection.PERSPECTIVE else rl.CameraProjection.ORTHOGRAPHIC;
+
+	vec_up: Vec3 = camera_up_to_vec3(up);
 
 	camera, camera_id := static_pool_new(_camera_storage);
 	camera.* = rl.Camera.{
 		position= 	camera_position,
 		target=   	.{ 0.0, 0.0, 0.0 },
-		up=       	up, // Same as blender!
+		up=       	vec_up, // Same as blender!
 		fovy= 	  	fov,
 		projection= camera_projection
 	};

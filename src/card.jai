@@ -1,15 +1,18 @@
 
-draw_card :: (front: rl.Model, back: rl.Model, rotation_angle: float) {
+draw_card :: (front: Model_Id, back: Model_Id, rotation_angle: float) {
+	front_model := get_model(front);
 	DrawModelEx(
-		front,
+		front_model,
 		.{ 0.0, 0.0, 0.0 },
 	   	.{ 0.0, 0.0, 1.0 },
 	   	rotation_angle-180.0,
 	    .{ 1.0, 1.0, 1.0 },
 	    .{ 255, 255, 255, 255 }
 	);
+
+	back_model  := get_model(back);
 	DrawModelEx(
-		back,
+		back_model,
 		.{ 0.0, 0.0, 0.0 },
 	   	.{ 0.0, 0.0, 1.0 },
 	   	rotation_angle,
@@ -17,4 +20,3 @@ draw_card :: (front: rl.Model, back: rl.Model, rotation_angle: float) {
 	    .{ 255, 255, 255, 255 }
 	);
 }
-

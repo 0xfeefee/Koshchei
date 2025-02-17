@@ -19,14 +19,18 @@ create_sprite :: (texture_id: Texture_Id, x: s32, y: s32, width: s32, height: s3
 	sprite.* = Sprite.{
 		texture= texture_id,
 		rect= .{
-			x= x,
-			y= y,
-			width= width,
-			height= height
+			x= xx x,
+			y= xx y,
+			width= xx width,
+			height= xx height
 		}
 	};
 
 	return sprite_id;
+}
+
+get_sprite :: inline (id: Sprite_Id) -> Sprite {
+	return static_pool_get(_sprite_storage, id);
 }
 
 get_texture :: inline (id: Texture_Id) -> *rl.Texture {
@@ -35,4 +39,4 @@ get_texture :: inline (id: Texture_Id) -> *rl.Texture {
 
 #scope_module
 _texture_storage: *Static_Pool(rl.Texture, MAX_TEXTURE_COUNT);
-_sprite_storage: *Static_Pool(rl.Texture, MAX_SPRITE_COUNT);
+_sprite_storage: *Static_Pool(Sprite, MAX_SPRITE_COUNT);
