@@ -4,7 +4,7 @@ Sprite_Id  :: s16;
 
 Sprite :: struct {
 	texture: Texture_Id;
-	rect: rl.Rectangle;
+	rect:    rl.Rectangle;
 }
 
 load_texture :: (image_file_name: string) -> Texture_Id {
@@ -29,7 +29,37 @@ create_sprite :: (texture_id: Texture_Id, x: s32, y: s32, width: s32, height: s3
 	return sprite_id;
 }
 
-get_sprite :: inline (id: Sprite_Id) -> Sprite {
+// @heisenbug: UV re-calculations break model upload!
+set_texture_uvs_from_sprite :: (mesh: *rl.Mesh, sprite_id: Sprite_Id) {
+	//
+	assert(mesh != null);
+	// Update mesh UV's to match the subtexture rect:
+	sprite := get_sprite(sprite_id);
+	assert(sprite != null);
+
+	rect := sprite.rect;
+
+	vcount := mesh.vertexCount*2;
+	atlas_width := 1024;
+	atlas_height := 384;
+	i: s32 = 0;
+
+	print("V-count: %\n", vcount);
+
+	for 0..vcount-2 {
+		u: f32 = mesh.texcoords[i];
+		v: f32 = mesh.texcoords[i + 1];
+
+		mesh.texcoords[i]     = rect.x / atlas_width + (u * rect.width / atlas_width);
+		mesh.texcoords[i + 1] = rect.y / atlas_height + (v * rect.height / atlas_height);
+
+		i += 2;
+	}
+
+	print("Success!!!!!!!!\n");
+}
+
+get_sprite :: inline (id: Sprite_Id) -> *Sprite {
 	return static_pool_get(_sprite_storage, id);
 }
 

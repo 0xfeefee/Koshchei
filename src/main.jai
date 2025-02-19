@@ -56,28 +56,28 @@ main :: () {
 
 	// Card face is just a quad (plane):
 	card_mesh  := gen_mesh_plane(2.0, 3.0, 1, 1);
+	// set_texture_uvs_from_sprite(*card_mesh, sprites[0]);
+
 	card_mesh2 := gen_mesh_plane(2.0, 3.0, 1, 1);
+	// set_texture_uvs_from_sprite(*card_mesh2, sprites[1]);
+
+	print("Meshes rdy for upload\n");
+
+	UploadMesh(*card_mesh, false);
+	UploadMesh(*card_mesh2, false);
+
+	print("Meshes uploaded");
 
 	// Front face:
 	card_frontface := create_model(card_mesh);
-	// set_texture_from_sprite(card_frontface, sprites[0]);
-	set_texture(card_frontface, card_front);
+	set_texture_from_sprite(card_frontface, sprites[0]);
 
 	// Back face:
 	card_backface := create_model(card_mesh2);
-	// set_texture_from_sprite(card_backface, sprites[2]);
-	set_texture(card_backface, card_back);
+	set_texture_from_sprite(card_backface, sprites[1]);
 
 	// State:
 	rotation_angle: f32;
-
-	sleep_milliseconds(500);
-
-	gmplane := gen_mesh_plane(4.0, 2.0, 1, 1);
-
-	// card_mesh_generated := gen_triangle_mesh();
-	// card_test := create_model(card_mesh_generated);
-	// set_texture(card_test, card_front);
 
 	// Run the main loop:
 	while should_run() {
@@ -163,10 +163,10 @@ gen_mesh_plane :: (width: f32, length: f32, res_x: s32, res_z: s32) -> Mesh {
 	vertices: *Vector3 = cast(*Vector3)MemAlloc(cast(u32, vertex_count * size_of(Vector3)));
 
 	for z: 0..(res_z-1) {
-		z_pos: f32 = (z / (res_z - 1) - 0.5) * length; //float zPos = ((float)z/(resZ - 1) - 0.5f)*length;
+		z_pos: f32 = (z / (res_z - 1) - 0.5) * length;
 
 		for x: 0..(res_x -1) {
-			x_pos: f32 = (x / (res_x - 1) - 0.5) * width; //float xPos = ((float)x/(resX - 1) - 0.5f)*width;
+			x_pos: f32 = (x / (res_x - 1) - 0.5) * width;
 			vertices[x + z * res_x] = Vector3.{ x_pos, 0.0, z_pos };
 		}
 	}
@@ -237,12 +237,10 @@ gen_mesh_plane :: (width: f32, length: f32, res_x: s32, res_z: s32) -> Mesh {
 		mesh.indices[i] = cast(u16)triangles[i];
 	}
 
-	MemFree(vertices);
-	MemFree(texcoords);
-	MemFree(normals);
-	MemFree(triangles);
-
-	UploadMesh(*mesh, false);
+	// MemFree(vertices);
+	// MemFree(texcoords);
+	// MemFree(normals);
+	// MemFree(triangles);
 
 	// Just for now...
 	return mesh;
