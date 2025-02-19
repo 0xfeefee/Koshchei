@@ -55,21 +55,29 @@ main :: () {
 	}
 
 	// Card face is just a quad (plane):
-	card_mesh := rl.GenMeshPlane(2.0, 3.0, 1, 1);
-	card_mesh2 := rl.GenMeshPlane(2.0, 3.0, 1, 1);
+	card_mesh  := gen_mesh_plane(2.0, 3.0, 1, 1);
+	card_mesh2 := gen_mesh_plane(2.0, 3.0, 1, 1);
 
 	// Front face:
 	card_frontface := create_model(card_mesh);
-	set_texture_from_sprite(card_frontface, sprites[0]);
-	// set_texture(card_frontface, card_front);
+	// set_texture_from_sprite(card_frontface, sprites[0]);
+	set_texture(card_frontface, card_front);
 
 	// Back face:
 	card_backface := create_model(card_mesh2);
-	set_texture_from_sprite(card_backface, sprites[2]);
-	// set_texture(card_backface, card_back);
+	// set_texture_from_sprite(card_backface, sprites[2]);
+	set_texture(card_backface, card_back);
 
 	// State:
 	rotation_angle: f32;
+
+	sleep_milliseconds(500);
+
+	gmplane := gen_mesh_plane(4.0, 2.0, 1, 1);
+
+	// card_mesh_generated := gen_triangle_mesh();
+	// card_test := create_model(card_mesh_generated);
+	// set_texture(card_test, card_front);
 
 	// Run the main loop:
 	while should_run() {
@@ -87,10 +95,157 @@ main :: () {
 			// Grid and main scene:
 			draw_screen_grid(32, 32);
 			begin_camera(current_camera); {
-				draw_card(card_frontface, card_backface, rotation_angle);
+				draw_card(card_front, card_back, rotation_angle);
 			}
 		}
 	}
+
+	print("Hello?\n");
+}
+
+gen_triangle_mesh :: () -> Mesh {
+	mesh := gen_mesh_base(triangle_count= 1);
+
+	// Vertex at (0, 0, 0):
+    mesh.vertices[0] = 0;
+    mesh.vertices[1] = 0;
+    mesh.vertices[2] = 0;
+    mesh.normals[0]  = 0;
+    mesh.normals[1]  = 1;
+    mesh.normals[2]  = 0;
+    mesh.texcoords[0] = 0;
+    mesh.texcoords[1] = 0;
+
+    // Vertex at (1, 0, 2)
+    mesh.vertices[3] = 1;
+    mesh.vertices[4] = 0;
+    mesh.vertices[5] = 2;
+    mesh.normals[3] = 0;
+    mesh.normals[4] = 1;
+    mesh.normals[5] = 0;
+    mesh.texcoords[2] = 0.5;
+    mesh.texcoords[3] = 1.0;
+
+    // Vertex at (2, 0, 0)
+    mesh.vertices[6] = 2;
+    mesh.vertices[7] = 0;
+    mesh.vertices[8] = 0;
+    mesh.normals[6] = 0;
+    mesh.normals[7] = 1;
+    mesh.normals[8] = 0;
+    mesh.texcoords[4] = 1;
+    mesh.texcoords[5] = 0;
+
+    UploadMesh(*mesh, false);
+	return mesh;
+}
+
+gen_mesh_base :: (triangle_count: s32) -> Mesh {
+	mesh: Mesh;
+	mesh.triangleCount = triangle_count;
+	mesh.vertexCount   = triangle_count * 3;
+	mesh.vertices      = cast(*float, MemAlloc(cast(u32, mesh.vertexCount * 3 * size_of(float))));
+	mesh.texcoords     = cast(*float, MemAlloc(cast(u32, mesh.vertexCount * 2 * size_of(float))));
+	mesh.normals       = cast(*float, MemAlloc(cast(u32, mesh.vertexCount * 3 * size_of(float))));
+
+	return mesh;
+}
+
+gen_mesh_plane :: (width: f32, length: f32, res_x: s32, res_z: s32) -> Mesh {
+	// Create mesh:
+	mesh: Mesh;
+
+	res_x += 1; // resX++
+	res_z += 1; // resY++
+
+ 	// Vertices definition:
+	vertex_count: s32 = res_x * res_z;
+	vertices: *Vector3 = cast(*Vector3)MemAlloc(cast(u32, vertex_count * size_of(Vector3)));
+
+	for z: 0..(res_z-1) {
+		z_pos: f32 = (z / (res_z - 1) - 0.5) * length; //float zPos = ((float)z/(resZ - 1) - 0.5f)*length;
+
+		for x: 0..(res_x -1) {
+			x_pos: f32 = (x / (res_x - 1) - 0.5) * width; //float xPos = ((float)x/(resX - 1) - 0.5f)*width;
+			vertices[x + z * res_x] = Vector3.{ x_pos, 0.0, z_pos };
+		}
+	}
+
+	// Normals definition:
+	normals: *Vector3 = cast(*Vector3)MemAlloc(cast(u32, vertex_count * size_of(Vector3)));
+	for n: 0..(vertex_count-1) {
+		normals[n] = Vector3.{ 0.0, 1.0, 0.0 };
+	}
+
+	// TexCoords definitions:
+	texcoords: *Vector2 = cast(*Vector2)MemAlloc(cast(u32, vertex_count * size_of(Vector2)));
+	for v: 0..(res_z-1) {
+		for u: 0..(res_x-1) {
+			texcoords[u + v * res_x] = Vector2.{ cast(float, u/(res_x-1)), cast(float, v/(res_z-1)) };
+		}
+	}
+
+	// Triangles definitions (indices):
+	num_faces: s32  = (res_x - 1) * (res_z - 1);
+	triangles: *s32 = cast(*s32)MemAlloc(cast(u32, num_faces * 6 * size_of(int)));
+	t:         s32  = 0;
+
+	for face: 0..(num_faces-1) {
+		i: s32 = face + face / (res_x - 1);
+
+		triangles[t] = i + res_x;
+		t += 1;
+		triangles[t] = i + 1;
+		t += 1;
+		triangles[t] = i;
+		t += 1;
+
+		triangles[t] = i + res_x;
+		t += 1;
+		triangles[t] = i + res_x + 1;
+		t += 1;
+		triangles[t] = i + 1;
+		t += 1;
+	}
+
+	// WTF - why are we copying this over like so?
+	mesh.vertexCount   = vertex_count;
+	mesh.triangleCount = num_faces * 2;
+	mesh.vertices      = cast(*float, MemAlloc(cast(u32, mesh.vertexCount * 3 * size_of(float))));
+	mesh.texcoords     = cast(*float, MemAlloc(cast(u32, mesh.vertexCount * 2 * size_of(float))));
+	mesh.normals       = cast(*float, MemAlloc(cast(u32, mesh.vertexCount * 3 * size_of(float))));
+	mesh.indices       = cast(*u16, MemAlloc(cast(u32, mesh.triangleCount * 3 * size_of(u16))));
+
+	for i: 0..(mesh.vertexCount-1) {
+		mesh.vertices[3 * i]     = vertices[i].x;
+		mesh.vertices[3 * i + 1] = vertices[i].y;
+		mesh.vertices[3 * i + 2] = vertices[i].z;
+	}
+
+	for i: 0..(mesh.vertexCount - 1) {
+		mesh.texcoords[2 * i]     = texcoords[i].x;
+		mesh.texcoords[2 * i + 1] = texcoords[i].y;
+	}
+
+	for i: 0..(mesh.vertexCount - 1) {
+		mesh.normals[3 * i]     = normals[i].x;
+		mesh.normals[3 * i + 1] = normals[i].y;
+		mesh.normals[3 * i + 2] = normals[i].z;
+	}
+
+	for i: 0..(mesh.triangleCount * 3 - 1) {
+		mesh.indices[i] = cast(u16)triangles[i];
+	}
+
+	MemFree(vertices);
+	MemFree(texcoords);
+	MemFree(normals);
+	MemFree(triangles);
+
+	UploadMesh(*mesh, false);
+
+	// Just for now...
+	return mesh;
 }
 
 #import "Basic";

@@ -50,7 +50,7 @@
 
     // Generate Raylib module if necessary:
     if !file_exists(tprint("%/raylib_win64", LOCAL_MODULE_IMPORT_DIRECTORY)) {
-        generate_raylib_module("raylib_win64", "../vendor/raylib-5.0_win64_msvc16");
+        generate_raylib_module("raylib_win64", "../vendor/raylib-5.5_win64_msvc16");
     }
 
     // Select build mode:

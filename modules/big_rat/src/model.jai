@@ -45,8 +45,7 @@ set_texture_from_sprite :: (model_id: Model_Id, sprite: Sprite_Id) {
 		i += 2;
 	}
 
-	rl.UpdateMeshBuffer(mesh, 1, mesh.texcoords, size_of(f32) * 2 * mesh.vertexCount, 0);
-
+	// rl.UpdateMeshBuffer(mesh, 1, mesh.texcoords, size_of(f32) * 2 * mesh.vertexCount, 0);
 }
 
 get_model :: (model_id: Model_Id) -> *rl.Model {
