@@ -55,10 +55,10 @@ main :: () {
 	}
 
 	// Card face is just a quad (plane):
-	card_mesh  := gen_mesh_plane(2.0, 3.0);
+	card_mesh  := gen_mesh_plane(2.0, 3.0, 1, 1);
 	set_texture_uvs_from_sprite(*card_mesh, sprites[0]);
 
-	card_mesh2 := gen_mesh_plane(2.0, 3.0);
+	card_mesh2 := gen_mesh_plane(2.0, 3.0, 1, 1);
 	set_texture_uvs_from_sprite(*card_mesh2, sprites[1]);
 
 	a: *Mesh = *card_mesh;
