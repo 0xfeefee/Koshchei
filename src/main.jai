@@ -205,39 +205,16 @@ gen_mesh_plane :: (width: f32, length: f32, res_x: s32, res_z: s32) -> Mesh {
 		t += 1;
 	}
 
-	// WTF - why are we copying this over like so?
 	mesh.vertexCount   = vertex_count;
 	mesh.triangleCount = num_faces * 2;
-	mesh.vertices      = cast(*float, MemAlloc(cast(u32, mesh.vertexCount * 3 * size_of(float))));
-	mesh.texcoords     = cast(*float, MemAlloc(cast(u32, mesh.vertexCount * 2 * size_of(float))));
-	mesh.normals       = cast(*float, MemAlloc(cast(u32, mesh.vertexCount * 3 * size_of(float))));
-	mesh.indices       = cast(*u16, MemAlloc(cast(u32, mesh.triangleCount * 3 * size_of(u16))));
-
-	for i: 0..(mesh.vertexCount-1) {
-		mesh.vertices[3 * i]     = vertices[i].x;
-		mesh.vertices[3 * i + 1] = vertices[i].y;
-		mesh.vertices[3 * i + 2] = vertices[i].z;
-	}
-
-	for i: 0..(mesh.vertexCount - 1) {
-		mesh.texcoords[2 * i]     = texcoords[i].x;
-		mesh.texcoords[2 * i + 1] = texcoords[i].y;
-	}
-
-	for i: 0..(mesh.vertexCount - 1) {
-		mesh.normals[3 * i]     = normals[i].x;
-		mesh.normals[3 * i + 1] = normals[i].y;
-		mesh.normals[3 * i + 2] = normals[i].z;
-	}
+	mesh.vertices      = cast(*float, vertices);
+	mesh.normals       = cast(*float, normals);
+	mesh.texcoords     = cast(*float, texcoords);
+	mesh.indices       = cast(*u16, triangles);
 
 	for i: 0..(mesh.triangleCount * 3 - 1) {
 		mesh.indices[i] = cast(u16)triangles[i];
 	}
-
-	// MemFree(vertices);
-	// MemFree(texcoords);
-	// MemFree(normals);
-	// MemFree(triangles);
 
 	// Just for now...
 	return mesh;
