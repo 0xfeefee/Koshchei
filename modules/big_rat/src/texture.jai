@@ -39,24 +39,31 @@ set_texture_uvs_from_sprite :: (mesh: *rl.Mesh, sprite_id: Sprite_Id) {
 
 	rect := sprite.rect;
 
-	vcount := mesh.vertexCount*2;
-	atlas_width := 1024;
-	atlas_height := 384;
+	vcount := mesh.vertexCount;
+	atlas_width  := 1024.0; // This isn't the full dimensions, but ok..
+	atlas_height := 384.0;
+
 	i: s32 = 0;
 
-	print("V-count: %\n", vcount);
-
-	for 0..vcount-2 {
+	for 0..vcount-1 {
 		u: f32 = mesh.texcoords[i];
 		v: f32 = mesh.texcoords[i + 1];
 
-		mesh.texcoords[i]     = rect.x / atlas_width + (u * rect.width / atlas_width);
-		mesh.texcoords[i + 1] = rect.y / atlas_height + (v * rect.height / atlas_height);
+		// @todo: clean this up a bit...
+		u2 := rect.x / atlas_width + (u * rect.width / atlas_width);
+		v2 := rect.y / atlas_height + (v * rect.height / atlas_height);
+
+		if (u2 < 0) u2 = 0;
+		if (v2 < 0) v2 = 0;
+
+		if (u2 > 1) u2 = 1;
+		if (v2 > 1) v2 = 1;
+
+		mesh.texcoords[i]     = u2;
+		mesh.texcoords[i + 1] = v2;
 
 		i += 2;
 	}
-
-	print("Success!!!!!!!!\n");
 }
 
 get_sprite :: inline (id: Sprite_Id) -> *Sprite {

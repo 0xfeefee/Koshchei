@@ -56,17 +56,16 @@ main :: () {
 
 	// Card face is just a quad (plane):
 	card_mesh  := gen_mesh_plane(2.0, 3.0, 1, 1);
-	// set_texture_uvs_from_sprite(*card_mesh, sprites[0]);
+	set_texture_uvs_from_sprite(*card_mesh, sprites[0]);
 
 	card_mesh2 := gen_mesh_plane(2.0, 3.0, 1, 1);
-	// set_texture_uvs_from_sprite(*card_mesh2, sprites[1]);
+	set_texture_uvs_from_sprite(*card_mesh2, sprites[1]);
 
-	print("Meshes rdy for upload\n");
+	a: *Mesh = *card_mesh;
+	b: *Mesh = *card_mesh2;
 
-	UploadMesh(*card_mesh, false);
-	UploadMesh(*card_mesh2, false);
-
-	print("Meshes uploaded");
+	UploadMesh(a, false);
+	UploadMesh(b, false);
 
 	// Front face:
 	card_frontface := create_model(card_mesh);
@@ -99,8 +98,6 @@ main :: () {
 			}
 		}
 	}
-
-	print("Hello?\n");
 }
 
 gen_triangle_mesh :: () -> Mesh {
