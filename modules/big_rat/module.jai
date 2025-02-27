@@ -13,6 +13,7 @@
 #load "src/model.jai";
 #load "src/debug.jai";
 #load "src/input.jai";
+#load "src/gen.jai";
 
 MAX_CAMERA_COUNT  :: 16;
 MAX_SHADER_COUNT  :: 8;
